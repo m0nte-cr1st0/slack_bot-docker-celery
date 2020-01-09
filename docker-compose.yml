@@ -1,0 +1,29 @@
+version: '3'
+
+services:
+  db:
+    image: mysql:5.7
+    restart: always
+    environment:
+      MYSQL_DATABASE: 'slack_bot'
+      MYSQL_USER: 'root'
+      MYSQL_PASSWORD: ''
+      MYSQL_ROOT_PASSWORD: '1q2w3e4r'
+    ports:
+      - '3308:3306'
+    volumes:
+      - /opt/slack_bot/mysql_data:/var/lib/mysql
+      - /tmp/slack_bot/mysqld:/var/run/mysqld
+  redis:
+    image: "redis:alpine"
+    volumes:
+      - /opt/slack_bot/redis_data:/var/lib/redis
+  web:
+    build: .
+    ports:
+      - "127.0.0.1:9001:9001"
+    command: python manage.py runserver 0.0.0.0:9001
+    depends_on:
+      - db
+    volumes:
+      - /tmp/slack_bot/mysqld:/run/mysqld
